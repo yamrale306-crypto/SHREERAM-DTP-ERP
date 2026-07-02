@@ -1,0 +1,101 @@
+{
+  "name": "shreeram-dtp-erp",
+  "version": "2.0.0",
+  "description": "Shreeram DTP & Offset - ERP System",
+  "main": "electron-main.js",
+  "scripts": {
+    "start": "node backend/server.js",
+    "dev": "nodemon backend/server.js",
+    "init-db": "node backend/scripts/init-db.js",
+    "build-exe": "pkg . --targets node18-win-x64 --output dist/Shreeram-ERP.exe",
+    "build-all": "pkg . --targets node18-win-x64,node18-macos-x64,node18-linux-x64 --output-path dist/",
+    "electron": "electron .",
+    "electron-build": "electron-builder",
+    "dist": "electron-builder --win",
+    "desktop:dev": "electron .",
+    "desktop:build": "electron-builder --win"
+  },
+  "bin": "launcher.js",
+  "pkg": {
+    "scripts": [
+      "launcher.js",
+      "backend/**/*.js"
+    ],
+    "assets": [
+      "public/**/*",
+      ".env.example"
+    ],
+    "targets": [
+      "node18-win-x64"
+    ],
+    "ignore": [
+      "passport",
+      "passport-google-oauth20",
+      "express-session"
+    ]
+  },
+  "build": {
+    "appId": "com.shreeramdtp.erp",
+    "productName": "Shreeram DTP ERP",
+    "npmRebuild": false,
+    "directories": {
+      "output": "electron-dist"
+    },
+    "asarUnpack": [
+      "node_modules/sqlite3/**/*"
+    ],
+    "files": [
+      "electron-main.js",
+      "backend/**/*",
+      "public/**/*",
+      "node_modules/**/*",
+      "package.json"
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "build/icon.ico",
+      "sign": false
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Shreeram DTP ERP"
+    }
+  },
+  "dependencies": {
+    "@fortawesome/fontawesome-free": "^7.3.0",
+    "axios": "^1.18.1",
+    "bcryptjs": "^2.4.3",
+    "bootstrap": "^5.3.8",
+    "chart.js": "^4.5.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "express-session": "^1.17.3",
+    "express-validator": "^7.0.1",
+    "jsonwebtoken": "^9.0.2",
+    "multer": "^1.4.5-lts.1",
+    "node-cron": "^3.0.3",
+    "passport": "^0.7.0",
+    "passport-google-oauth20": "^2.0.0",
+    "pdfkit": "^0.13.0",
+    "sqlite3": "^6.0.1"
+  },
+  "devDependencies": {
+    "electron": "^27.3.11",
+    "electron-builder": "^24.13.3",
+    "nodemon": "^3.0.2",
+    "pkg": "^5.8.1"
+  },
+  "keywords": [
+    "erp",
+    "dtp",
+    "offset",
+    "printing",
+    "business"
+  ],
+  "author": "Shreeram DTP & Offset",
+  "license": "MIT"
+}

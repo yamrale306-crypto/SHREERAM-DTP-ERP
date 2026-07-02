@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Tax Invoice - <%= invoice.invoice_no %></title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 12px;
+    color: #1a1a1a;
+    padding: 24px;
+  }
+  .top-bar {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 10px;
+  }
+  .top-bar .tag { font-weight: bold; font-size: 13px; }
+  .top-bar .badge { border: 1px solid #333; padding: 3px 10px; font-size: 11px; border-radius: 3px; }
+  .top-bar .tagline { font-style: italic; font-size: 11px; }
+
+  .header { display: flex; border: 1px solid #333; }
+  .header .company { flex: 1.4; padding: 12px; border-right: 1px solid #333; }
+  .header .company .logo-row { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+  .header .company h1 { font-size: 15px; }
+  .header .meta { flex: 1; padding: 12px; }
+  .header .meta div { margin-bottom: 8px; }
+  .header .meta .label { font-size: 10px; color: #555; }
+  .header .meta .value { font-weight: bold; font-size: 12px; }
+
+  .status-badge {
+    display: inline-block; padding: 3px 10px; border-radius: 3px;
+    font-size: 11px; font-weight: bold; text-transform: uppercase;
+    margin-top: 4px;
+  }
+  .status-unpaid   { background: #fde2e2; color: #a30000; border: 1px solid #a30000; }
+  .status-partial  { background: #fff3cd; color: #8a6500; border: 1px solid #8a6500; }
+  .status-paid     { background: #d9f2d9; color: #1c6b1c; border: 1px solid #1c6b1c; }
+  .status-overdue  { background: #f3d1ff; color: #6a1b9a; border: 1px solid #6a1b9a; }
+
+  .bill-ship { display: flex; border: 1px solid #333; border-top: none; }
+  .bill-ship .col { flex: 1; padding: 10px; }
+  .bill-ship .col:first-child { border-right: 1px solid #333; }
+  .bill-ship h3 { font-size: 11px; margin-bottom: 4px; }
+
+  table.items { width: 100%; border-collapse: collapse; border: 1px solid #333; border-top: none; }
+  table.items th, table.items td { border: 1px solid #333; padding: 6px 8px; font-size: 11px; }
+  table.items th { background: #f2f2f2; text-align: left; }
+  table.items td.num, table.items th.num { text-align: right; }
+  table.items tfoot td { font-weight: bold; }
+  .payment-summary { display: flex; border: 1px solid #333; border-top: none; }
+  .payment-summary .box { flex: 1; padding: 8px 10px; border-right: 1px solid #333; }
+  .payment-summary .box:last-child { border-right: none; }
+  .payment-summary .label { font-size: 10px; color: #555; }
+  .payment-summary .value { font-size: 13px; font-weight: bold; }
+  .payment-summary .balance { color: #a30000; }
+
+  table.tax-summary { width: 100%; border-collapse: collapse; border: 1px solid #333; border-top: none; }
+  table.tax-summary th, table.tax-summary td { border: 1px solid #333; padding: 6px 8px; font-size: 11px; text-align: right; }
+  table.tax-summary th { background: #f2f2f2; }
+  table.tax-summary td.left, table.tax-summary th.left { text-align: left; }
+
+  .words-box { border: 1px solid #333; border-top: none; padding: 8px 10px; font-size: 11px; }
+
+  .terms-box { border: 1px solid #333; border-top: none; padding: 8px 10px; font-size: 10px; color: #333; }
+  .terms-box h4 { font-size: 11px; margin-bottom: 4px; }
+  .terms-box ol { padding-left: 16px; }
+  .terms-box li { margin-bottom: 2px; }
+
+  .footer { display: flex; border: 1px solid #333; border-top: none; }
+  .footer .bank { flex: 1; padding: 10px; border-right: 1px solid #333; font-size: 11px; }
+  .footer .bank div { margin-bottom: 3px; }
+  .footer .sign { flex: 1; padding: 10px; text-align: center; font-size: 11px; display: flex; flex-direction: column; justify-content: flex-end; }
+  .footer .sign img { max-height: 40px; margin-bottom: 6px; align-self: center; }
+</style>
+  <div class="top-bar">
+    <div class="tag">TAX INVOICE <span class="badge"><%= invoice.copy_type || 'ORIGINAL FOR RECIPIENT' %></span></div>
+    <div class="tagline"><%= company.tagline || '' %></div>
+  </div>
+
+  <div class="header">
+    <div class="company">
+      <div class="logo-row">
+        <% if (company.logo_url) { %><img src="<%= company.logo_url %>" style="height:40px;"><% } %>
+        <h1><%= company.name %></h1>
+      </div>
+      <div><%= company.address %></div>
+      <div><strong>GSTIN:</strong> <%= company.gstin %> &nbsp; <strong>Mobile:</strong> <%= company.mobile %></div>
+      <div><strong>PAN:</strong> <%= company.pan %> &nbsp; <strong>Email:</strong> <%= company.email %></div>
+    </div>
+    <div class="meta">
+      <div>
+        <div class="label">Invoice No.</div>
+        <div class="value"><%= invoice.invoice_no %></div>
+      </div>
+      <div>
+        <div class="label">Invoice Date</div>
+        <div class="value"><%= invoice.invoice_date_display %></div>
+      </div>
+      <div>
+        <div class="label">Due Date</div>
+        <div class="value"><%= invoice.due_date_display %></div>
+      </div>
+      <div>
+        <span class="status-badge status-<%= invoice.status_class %>"><%= invoice.status_label %></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="bill-ship">
+    <div class="col">
+      <h3>BILL TO</h3>
+      <strong><%= buyer.name %></strong><br>
+      <%= buyer.address %><br>
+      GSTIN: <%= buyer.gstin %> &nbsp; Place of Supply: <%= buyer.place_of_supply %><br>
+      Mobile: <%= buyer.mobile %> &nbsp; PAN: <%= buyer.pan %>
+    </div>
+    <div class="col">
+      <h3>SHIP TO</h3>
+      <strong><%= ship.name %></strong><br>
+      <%= ship.address %>
+    </div>
+  </div>
+
+  <table class="items">
+    <thead>
+      <tr>
+        <th>S.NO.</th><th>ITEMS</th><th>HSN</th>
+        <th class="num">QTY.</th><th class="num">RATE</th>
+        <th class="num">TAX</th><th class="num">AMOUNT</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% items.forEach(function(item, i) { %>
+      <tr>
+        <td><%= i + 1 %></td>
+        <td><strong><%= item.item_name %></strong><br><span style="color:#666"><%= item.item_desc %></span></td>
+        <td><%= item.hsn %></td>
+        <td class="num"><%= item.qty %> <%= item.unit %></td>
+        <td class="num"><%= item.rate.toFixed(2) %></td>
+        <td class="num"><%= item.tax_amount.toFixed(2) %> (<%= item.tax_pct %>%)</td>
+        <td class="num"><%= item.line_total.toFixed(2) %></td>
+      </tr>
+      <% }); %>
+    </tbody>
+    <tfoot>
+      <tr>
+        <td colspan="3">TOTAL</td>
+        <td class="num"><%= totals.total_qty %></td>
+        <td></td>
+        <td class="num"><%= totals.total_tax.toFixed(2) %></td>
+        <td class="num"><%= totals.grand_total.toFixed(2) %></td>
+      </tr>
+    </tfoot>
+  </table>
+
+  <div class="payment-summary">
+    <div class="box">
+      <div class="label">Grand Total</div>
+      <div class="value">&#8377; <%= totals.grand_total.toFixed(2) %></div>
+    </div>
+    <div class="box">
+      <div class="label">Received Amount</div>
+      <div class="value">&#8377; <%= totals.received_amount.toFixed(2) %></div>
+    </div>
+    <div class="box">
+      <div class="label">Balance Due</div>
+      <div class="value balance">&#8377; <%= totals.balance_due.toFixed(2) %></div>
+    </div>
+  </div>
+
+  <table class="tax-summary">
+    <thead>
+      <tr>
+        <th class="left">HSN/SAC</th><th>Taxable Value</th>
+        <th colspan="2">CGST</th><th colspan="2">SGST</th>
+        <th>Total Tax</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% tax_rows.forEach(function(row) { %>
+      <tr>
+        <td class="left"><%= row.hsn %></td>
+        <td><%= row.taxable_value.toFixed(2) %></td>
+        <td><%= row.cgst_rate %>%</td><td><%= row.cgst_amount.toFixed(2) %></td>
+        <td><%= row.sgst_rate %>%</td><td><%= row.sgst_amount.toFixed(2) %></td>
+        <td><%= row.total_tax.toFixed(2) %></td>
+      </tr>
+      <% }); %>
+    </tbody>
+  </table>
+
+  <div class="words-box">
+    <strong>Total Amount (in words):</strong> <%= invoice.amount_in_words %>
+  </div>
+
+  <div class="terms-box">
+    <h4>Terms & Conditions</h4>
+    <ol>
+      <li>Payment due within <%= invoice.payment_terms_days %> days of invoice date.</li>
+      <li>Goods once sold will not be taken back or exchanged.</li>
+      <li>Interest @18% p.a. will be charged on overdue payments.</li>
+      <li>Subject to <%= company.jurisdiction_city %> jurisdiction only.</li>
+    </ol>
+  </div>
+
+  <div class="footer">
+    <div class="bank">
+      <strong>Bank Details</strong>
+      <div>Name: <%= bank.account_name %></div>
+      <div>IFSC Code: <%= bank.ifsc %></div>
+      <div>Account No: <%= bank.account_no %></div>
+      <div>Bank: <%= bank.name %></div>
+    </div>
+    <div class="sign">
+      <% if (company.signature_url) { %><img src="<%= company.signature_url %>"><% } %>
+      <div>Authorised Signatory For<br><%= company.name %></div>
+    </div>
+  </div>
+
+</body>
+</html>

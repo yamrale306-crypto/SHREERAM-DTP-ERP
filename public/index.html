@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#1565C0">
+  <title>Shreeram DTP & Offset — ERP</title>
+  <link rel="manifest" href="#" />
+  <link href="vendor/bootstrap/bootstrap.min.css" rel="stylesheet">
+  <link href="vendor/fontawesome/css/all.min.css" rel="stylesheet">
+  <script src="vendor/chartjs/chart.umd.js"></script>
+  <style>
+    :root {
+      --primary: #1565C0;
+      --primary-dark: #0D47A1;
+      --primary-light: #1976D2;
+      --accent: #FF6D00;
+      --accent-light: #FF8F00;
+      --success: #2E7D32;
+      --warning: #F57F17;
+      --danger: #C62828;
+      --info: #01579B;
+      --bg: #F5F7FA;
+      --bg2: #FFFFFF;
+      --bg3: #EEF2F7;
+      --sidebar-bg: #0D2B5E;
+      --sidebar-text: #B8CBEA;
+      --sidebar-active: #FFFFFF;
+      --sidebar-active-bg: #1565C0;
+      --text: #1A2340;
+      --text2: #4A5568;
+      --text3: #8A99B3;
+      --border: #DDE3EE;
+      --card-shadow: 0 2px 12px rgba(21,101,192,0.08);
+      --sidebar-w: 260px;
+      --topbar-h: 60px;
+    }
+    [data-theme="dark"] {
+      --bg: #0F1624;
+      --bg2: #182035;
+      --bg3: #1E2A45;
+      --sidebar-bg: #0A1020;
+      --sidebar-text: #8A99B3;
+      --text: #E8EDF5;
+      --text2: #A0AEC0;
+      --text3: #6B7A99;
+      --border: #2A3856;
+      --card-shadow: 0 2px 12px rgba(0,0,0,0.3);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); transition: background 0.3s, color 0.3s; }
+
+    /* LOGIN PAGE */
+    #login-page {
+      display: flex; align-items: center; justify-content: center;
+      min-height: 100vh; background: linear-gradient(135deg, #0D2B5E 0%, #1565C0 100%);
+      padding: 20px;
+    }
+    .login-card {
+      background: var(--bg2); border-radius: 20px; padding: 40px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3); width: 100%; max-width: 420px;
+      animation: modalIn 0.4s ease;
+    }
+    .login-logo {
+      text-align: center; margin-bottom: 30px;
+    }
+    .login-logo i { font-size: 48px; color: var(--primary); margin-bottom: 10px; }
+    .login-logo h2 { font-size: 22px; font-weight: 800; color: var(--text); }
+    .login-logo p { font-size: 13px; color: var(--text3); margin-top: 4px; }
+    .form-group { margin-bottom: 18px; }
+    .form-group label { display: block; font-size: 12px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+    .form-control {
+      width: 100%; padding: 12px 16px; border: 2px solid var(--border); border-radius: 10px;
+      background: var(--bg3); color: var(--text); font-size: 14px; outline: none; transition: all 0.2s;
+    }
+    .form-control:focus { border-color: var(--primary); background: var(--bg2); }
+    .btn-login {
+      width: 100%; padding: 14px; background: var(--primary); color: white; border: none;
+      border-radius: 10px; font-size: 15px; font-weight: 700; cursor: pointer;
+      transition: all 0.2s; margin-top: 10px;
+    }
+    .btn-login:hover { background: var(--primary-dark); transform: translateY(-2px); box-shadow: 0 8px 20px rgba(21,101,192,0.3); }
+    .login-error {
+      background: rgba(198,40,40,0.1); color: var(--danger); padding: 12px;
+      border-radius: 8px; font-size: 13px; margin-bottom: 15px; display: none;
+      border: 1px solid rgba(198,40,40,0.2);
+    }
+    .divider {
+      display: flex; align-items: center; margin: 20px 0;
+      color: var(--text3); font-size: 12px;
+    }
+    .divider::before, .divider::after {
+      content: ''; flex: 1; height: 1px; background: var(--border);
+    }
+    .divider span { padding: 0 10px; }
+    .btn-google {
+      width: 100%; padding: 12px; background: white; color: #333; border: 2px solid var(--border);
+      border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer;
+      transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 10px;
+    }
+    .btn-google:hover { background: #f8f9fa; border-color: #4285f4; transform: translateY(-1px); }
+    .btn-google i { color: #4285f4; font-size: 18px; }
+
+    /* SIDEBAR */
+    #sidebar {
+      position: fixed; left: 0; top: 0; width: var(--sidebar-w); height: 100vh;
+      background: var(--sidebar-bg); z-index: 1000; overflow-y: auto;
+      transition: transform 0.3s ease; display: flex; flex-direction: column;
+    }
+    #sidebar::-webkit-scrollbar { width: 3px; }
+    #sidebar::-webkit-scrollbar-thumb { background: #1565C0; }
+    .sidebar-logo {
+      padding: 18px 20px 14px; border-bottom: 1px solid rgba(255,255,255,0.07);
+      display: flex; align-items: center; gap: 12px; flex-shrink: 0;
+    }
+    .sidebar-logo .logo-icon {
+      width: 40px; height: 40px; background: var(--accent); border-radius: 10px;
+      display: flex; align-items: center; justify-content: center; font-size: 18px; color: white; flex-shrink: 0;
+    }
+    .sidebar-logo .logo-text { line-height: 1.2; }
+    .sidebar-logo .logo-text strong { color: #fff; font-size: 14px; display: block; }
+    .sidebar-logo .logo-text span { color: var(--sidebar-text); font-size: 11px; }
+    .sidebar-nav { flex: 1; padding: 12px 0; }
+    .nav-section { padding: 6px 16px 4px; font-size: 10px; font-weight: 700; letter-spacing: 1.2px; color: var(--sidebar-text); text-transform: uppercase; opacity: 0.6; margin-top: 8px; }
+    .nav-item {
+      display: flex; align-items: center; gap: 10px; padding: 9px 20px;
+      color: var(--sidebar-text); cursor: pointer; font-size: 13.5px;
+      transition: all 0.2s; border-left: 3px solid transparent; position: relative;
+    }
+    .nav-item:hover { color: #fff; background: rgba(255,255,255,0.05); }
+    .nav-item.active { color: var(--sidebar-active); background: var(--sidebar-active-bg); border-left-color: var(--accent); }
+    .nav-item .nav-icon { width: 18px; text-align: center; flex-shrink: 0; }
+    .nav-item .badge-pill {
+      margin-left: auto; background: var(--accent); color: white;
+      font-size: 10px; padding: 1px 7px; border-radius: 20px; font-weight: 600;
+    }
+    .sidebar-bottom { padding: 16px; border-top: 1px solid rgba(255,255,255,0.07); }
+    .user-card { display: flex; align-items: center; gap: 10px; }
+    .user-avatar {
+      width: 36px; height: 36px; background: var(--primary); border-radius: 50%;
+      display: flex; align-items: center; justify-content: center; color: white; font-size: 14px; font-weight: 700; flex-shrink: 0;
+    }
+    .user-avatar img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+    .user-info strong { color: white; font-size: 13px; display: block; }
+    .user-info span { color: var(--sidebar-text); font-size: 11px; }
+
+    /* TOPBAR */
+    #topbar {
+      position: fixed; left: var(--sidebar-w); top: 0; right: 0; height: var(--topbar-h);
+      background: var(--bg2); border-bottom: 1px solid var(--border); z-index: 900;
+      display: flex; align-items: center; padding: 0 24px; gap: 16px;
+      transition: left 0.3s; box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    }
+    .topbar-title { font-size: 17px; font-weight: 700; color: var(--text); flex: 1; }
+    .topbar-title span { color: var(--primary); }
+    .topbar-search {
+      display: flex; align-items: center; background: var(--bg3); border: 1px solid var(--border);
+      border-radius: 8px; padding: 6px 14px; gap: 8px; min-width: 220px;
+    }
+    .topbar-search input { border: none; background: transparent; color: var(--text); outline: none; font-size: 13px; width: 100%; }
+    .topbar-search input::placeholder { color: var(--text3); }
+    .topbar-btn {
+      width: 36px; height: 36px; border-radius: 8px; border: 1px solid var(--border);
+      background: var(--bg3); color: var(--text2); display: flex; align-items: center; justify-content: center;
+      cursor: pointer; font-size: 15px; transition: all 0.2s; position: relative;
+    }
+    .topbar-btn:hover { background: var(--primary); color: white; border-color: var(--primary); }
+    .topbar-btn .notif-dot {
+      width: 8px; height: 8px; background: var(--accent); border-radius: 50%;
+      position: absolute; top: 4px; right: 4px; border: 2px solid var(--bg2);
+    }
+    #menu-toggle { display: none; }
+
+    /* MAIN */
+    #main {
+      margin-left: var(--sidebar-w); margin-top: var(--topbar-h);
+      min-height: calc(100vh - var(--topbar-h)); padding: 24px; transition: margin-left 0.3s;
+    }
+    .page { display: none; animation: fadeIn 0.3s ease; }
+    .page.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+    .page-header { margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+    .page-header h2 { font-size: 20px; font-weight: 700; color: var(--text); }
+    .page-header p { color: var(--text3); font-size: 13px; margin-top: 2px; }
+
+    /* STAT CARDS */
+    .stat-card {
+      background: var(--bg2); border-radius: 14px; padding: 20px 22px;
+      border: 1px solid var(--border); box-shadow: var(--card-shadow);
+      display: flex; flex-direction: column; gap: 8px; position: relative; overflow: hidden;
+    }
+    .stat-card::before {
+      content: ''; position: absolute; top: 0; right: 0; width: 80px; height: 80px;
+      border-radius: 0 0 0 100%; opacity: 0.08;
+    }
+    .stat-card.blue::before { background: var(--primary); }
+    .stat-card.orange::before { background: var(--accent); }
+    .stat-card.green::before { background: var(--success); }
+    .stat-card.red::before { background: var(--danger); }
+    .stat-label { font-size: 12px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: 0.5px; }
+    .stat-value { font-size: 24px; font-weight: 700; color: var(--text); line-height: 1.1; font-family: 'Segoe UI', 'Inter', system-ui, sans-serif; font-variant-numeric: tabular-nums; letter-spacing: -0.3px; padding-right: 38px; }
+    .stat-value .currency { font-size: 14px; font-weight: 600; color: var(--text3); }
+    .stat-footer { font-size: 12px; color: var(--text3); display: flex; align-items: center; gap: 4px; }
+    .stat-footer .up { color: var(--success); } .stat-footer .dn { color: var(--danger); }
+    .stat-icon {
+      position: absolute; top: 18px; right: 18px; width: 38px; height: 38px;
+      border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 17px;
+    }
+    .stat-card.blue .stat-icon { background: rgba(21,101,192,0.12); color: var(--primary); }
+    .stat-card.orange .stat-icon { background: rgba(255,109,0,0.12); color: var(--accent); }
+    .stat-card.green .stat-icon { background: rgba(46,125,50,0.12); color: var(--success); }
+    .stat-card.red .stat-icon { background: rgba(198,40,40,0.12); color: var(--danger); }
+
+    /* COMPACT DASHBOARD */
+    #page-dashboard .stat-card { padding: 12px 16px; gap: 3px; border-radius: 10px; }
+    #page-dashboard .stat-value { font-size: 21px; font-weight: 700; padding-right: 34px; }
+    #page-dashboard .stat-icon { width: 30px; height: 30px; font-size: 13px; top: 12px; right: 12px; }
+    #page-dashboard .stat-label { font-size: 11px; }
+    #page-dashboard .report-metric { padding: 8px; }
+    #page-dashboard .report-metric .rm-val { font-size: 18px; }
+    #page-dashboard .rm-label { font-size: 11px; }
+    #page-dashboard .quick-action { padding: 10px 8px; }
+    #page-dashboard .qa-icon { font-size: 20px; }
+    #page-dashboard .qa-label { font-size: 11px; }
+    #page-dashboard .dash-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 10px; }
+    #page-dashboard .dash-summary-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+    @media (max-width: 768px) {
+      #page-dashboard .dash-stats { grid-template-columns: 1fr; }
+      #page-dashboard .dash-summary-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    /* CARDS */
+    .card-box { background: var(--bg2); border-radius: 14px; border: 1px solid var(--border); box-shadow: var(--card-shadow); }
+    .card-box .card-head { padding: 16px 20px 12px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+    .card-box .card-head h3 { font-size: 15px; font-weight: 700; color: var(--text); }
+    .card-box .card-body-p { padding: 18px 20px; }
+
+    /* TABLE */
+    .erp-table { width: 100%; border-collapse: collapse; }
+    .erp-table th { font-size: 11px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: 0.5px; padding: 10px 14px; border-bottom: 2px solid var(--border); background: var(--bg3); text-align: left; }
+    .erp-table td { padding: 11px 14px; border-bottom: 1px solid var(--border); font-size: 13.5px; color: var(--text2); }
+    .erp-table tr:last-child td { border-bottom: none; }
+    .erp-table tr:hover td { background: var(--bg3); }
+    .erp-table .customer-name { font-weight: 600; color: var(--text); }
+
+    /* BADGES */
+    .badge-status { padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+    .bs-pending { background: rgba(245,127,23,0.12); color: var(--warning); }
+    .bs-progress { background: rgba(21,101,192,0.12); color: var(--primary); }
+    .bs-done { background: rgba(46,125,50,0.12); color: var(--success); }
+    .bs-cancelled { background: rgba(198,40,40,0.12); color: var(--danger); }
+    .bs-paid { background: rgba(46,125,50,0.12); color: var(--success); }
+    .bs-unpaid { background: rgba(198,40,40,0.12); color: var(--danger); }
+    .bs-partial { background: rgba(245,127,23,0.12); color: var(--warning); }
+
+    /* PRIORITY */
+    .priority-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 5px; }
+    .p-high { background: var(--danger); }
+    .p-medium { background: var(--warning); }
+    .p-low { background: var(--success); }
+
+    /* FORMS */
+    .form-label-erp { font-size: 12px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 6px; display: block; }
+    .form-control-erp {
+      width: 100%; padding: 9px 14px; border: 1.5px solid var(--border); border-radius: 8px;
+      background: var(--bg3); color: var(--text); font-size: 13.5px; outline: none; transition: border 0.2s;
+    }
+    .form-control-erp:focus { border-color: var(--primary); background: var(--bg2); }
+    .form-control-erp::placeholder { color: var(--text3); }
+    select.form-control-erp { cursor: pointer; }
+
+    /* BTNs */
+    .btn-primary-erp {
+      background: var(--primary); color: white; border: none; padding: 9px 20px;
+      border-radius: 8px; font-size: 13.5px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 8px;
+    }
+    .btn-primary-erp:hover { background: var(--primary-dark); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(21,101,192,0.3); }
+    .btn-accent-erp {
+      background: var(--accent); color: white; border: none; padding: 9px 20px;
+      border-radius: 8px; font-size: 13.5px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 8px;
+    }
+    .btn-accent-erp:hover { background: var(--accent-light); transform: translateY(-1px); }
+    .btn-ghost-erp {
+      background: transparent; color: var(--text2); border: 1.5px solid var(--border); padding: 8px 16px;
+      border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 7px;
+    }
+    .btn-ghost-erp:hover { border-color: var(--primary); color: var(--primary); background: rgba(21,101,192,0.05); }
+    .btn-sm-erp { padding: 5px 12px !important; font-size: 12px !important; }
+    .btn-icon { width: 32px; height: 32px; border-radius: 7px; border: 1.5px solid var(--border); background: var(--bg3); color: var(--text2); display: inline-flex; align-items: center; justify-content: center; cursor: pointer; font-size: 13px; transition: all 0.2s; }
+    .btn-icon:hover { background: var(--primary); color: white; border-color: var(--primary); }
+    .btn-icon.danger:hover { background: var(--danger); border-color: var(--danger); }
+
+    /* JOB TRACKER */
+    .job-stages { display: flex; align-items: center; gap: 0; }
+    .job-stage {
+      display: flex; flex-direction: column; align-items: center; flex: 1; position: relative;
+    }
+    .job-stage::before {
+      content: ''; position: absolute; top: 14px; left: -50%; width: 100%; height: 2px; background: var(--border); z-index: 0;
+    }
+    .job-stage:first-child::before { display: none; }
+    .job-stage .stage-dot {
+      width: 28px; height: 28px; border-radius: 50%; border: 2px solid var(--border); background: var(--bg2);
+      display: flex; align-items: center; justify-content: center; font-size: 11px; z-index: 1; position: relative; transition: all 0.3s;
+    }
+    .job-stage.done .stage-dot { background: var(--success); border-color: var(--success); color: white; }
+    .job-stage.done::before { background: var(--success); }
+    .job-stage.active .stage-dot { background: var(--primary); border-color: var(--primary); color: white; }
+    .job-stage .stage-label { font-size: 10px; color: var(--text3); margin-top: 4px; font-weight: 600; text-align: center; }
+    .job-stage.done .stage-label { color: var(--success); }
+    .job-stage.active .stage-label { color: var(--primary); }
+
+    /* CHART CONTAINERS */
+    .chart-wrap { position: relative; }
+
+    /* INVENTORY */
+    .stock-bar-wrap { margin-bottom: 14px; }
+    .stock-bar-top { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 13px; }
+    .stock-bar-top span:first-child { font-weight: 600; color: var(--text); }
+    .stock-bar-top span:last-child { color: var(--text3); }
+    .stock-bar { height: 8px; background: var(--bg3); border-radius: 20px; overflow: hidden; }
+    .stock-bar-fill { height: 100%; border-radius: 20px; transition: width 0.8s ease; }
+    .stock-bar-fill.ok { background: var(--success); }
+    .stock-bar-fill.warn { background: var(--warning); }
+    .stock-bar-fill.low { background: var(--danger); }
+
+    /* MODAL */
+    .erp-modal-overlay {
+      display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 2000;
+      align-items: center; justify-content: center; backdrop-filter: blur(2px);
+    }
+    .erp-modal-overlay.open { display: flex; }
+    .erp-modal {
+      background: var(--bg2); border-radius: 16px; border: 1px solid var(--border);
+      width: 90%; max-width: 560px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+      animation: modalIn 0.3s ease;
+    }
+    @keyframes modalIn { from { opacity: 0; transform: scale(0.95) translateY(10px); } to { opacity: 1; transform: none; } }
+    .erp-modal-head { padding: 20px 24px 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+    .erp-modal-head h4 { font-size: 16px; font-weight: 700; color: var(--text); }
+    .modal-close { width: 30px; height: 30px; border-radius: 7px; border: none; background: var(--bg3); color: var(--text2); cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; }
+    .modal-close:hover { background: var(--danger); color: white; }
+    .erp-modal-body { padding: 20px 24px; }
+    .erp-modal-foot { padding: 14px 24px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 10px; }
+
+    /* QUICK ACTIONS */
+    .quick-action {
+      background: var(--bg2); border: 1.5px solid var(--border); border-radius: 12px;
+      padding: 16px 14px; text-align: center; cursor: pointer; transition: all 0.2s; display: flex; flex-direction: column; align-items: center; gap: 8px;
+    }
+    .quick-action:hover { border-color: var(--primary); background: rgba(21,101,192,0.04); transform: translateY(-2px); box-shadow: var(--card-shadow); }
+    .quick-action .qa-icon { font-size: 22px; }
+    .quick-action .qa-label { font-size: 12px; font-weight: 600; color: var(--text2); }
+
+    /* KANBAN PRODUCTION */
+    .kanban-col { background: var(--bg3); border-radius: 12px; padding: 14px; min-width: 180px; }
+    .kanban-col-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text3); margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; }
+    .kanban-card { background: var(--bg2); border-radius: 9px; padding: 12px; margin-bottom: 10px; border: 1px solid var(--border); cursor: pointer; transition: all 0.2s; }
+    .kanban-card:hover { border-color: var(--primary); box-shadow: var(--card-shadow); }
+    .kanban-card .kc-job { font-size: 11px; color: var(--primary); font-weight: 700; margin-bottom: 4px; }
+    .kanban-card .kc-name { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+    .kanban-card .kc-info { font-size: 11px; color: var(--text3); }
+
+    /* REPORT METRIC */
+    .report-metric { text-align: center; padding: 20px; }
+    .report-metric .rm-val { font-size: 32px; font-weight: 800; color: var(--primary); }
+    .report-metric .rm-label { font-size: 12px; color: var(--text3); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px; }
+
+    /* TIMELINE */
+    .timeline { position: relative; padding-left: 24px; }
+    .timeline::before { content: ''; position: absolute; left: 8px; top: 0; bottom: 0; width: 2px; background: var(--border); }
+    .tl-item { position: relative; padding-bottom: 20px; }
+    .tl-dot { position: absolute; left: -20px; top: 3px; width: 14px; height: 14px; border-radius: 50%; border: 2px solid var(--bg2); }
+    .tl-dot.blue { background: var(--primary); }
+    .tl-dot.orange { background: var(--accent); }
+    .tl-dot.green { background: var(--success); }
+    .tl-dot.red { background: var(--danger); }
+    .tl-text { font-size: 13px; color: var(--text2); }
+    .tl-text strong { color: var(--text); }
+    .tl-time { font-size: 11px; color: var(--text3); margin-top: 2px; }
+
+    /* NOTIFICATION PANEL */
+    .notif-item { display: flex; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border); }
+    .notif-item:last-child { border-bottom: none; }
+    .notif-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 15px; flex-shrink: 0; }
+    .notif-icon.blue { background: rgba(21,101,192,0.12); color: var(--primary); }
+    .notif-icon.orange { background: rgba(255,109,0,0.12); color: var(--accent); }
+    .notif-icon.green { background: rgba(46,125,50,0.12); color: var(--success); }
+    .notif-icon.red { background: rgba(198,40,40,0.12); color: var(--danger); }
+    .notif-text { font-size: 13px; color: var(--text2); flex: 1; }
+    .notif-text strong { color: var(--text); }
+    .notif-time { font-size: 11px; color: var(--text3); }
+
+    /* RESPONSIVE */
+    @media (max-width: 900px) {
+      #sidebar { transform: translateX(calc(-1 * var(--sidebar-w))); box-shadow: none; }
+      #sidebar.open { transform: translateX(0); box-shadow: 4px 0 32px rgba(0,0,0,0.4); }
+      #topbar { left: 0; }
+      #main { margin-left: 0; }
+      #menu-toggle { display: flex; }
+      .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 999; }
+      .overlay.show { display: block; }
+    }
+
+    @media (max-width: 600px) {
+      #main { padding: 12px 12px 72px; }
+      #topbar { height: 52px; padding: 0 12px; gap: 10px; }
+      .stat-card { padding: 14px 16px; }
+      .stat-value { font-size: 20px; }
+      .card-box .card-head { padding: 12px 14px 10px; }
+      .card-box .card-body-p { padding: 14px; }
+      .erp-table th { font-size: 10px; padding: 8px 10px; }
+      .erp-table td { font-size: 12px; padding: 9px 10px; }
+      .page-header { flex-direction: column; align-items: flex-start; }
+      .btn-primary-erp, .btn-ghost-erp { width: 100%; justify-content: center; }
+    }
+
+    @media print {
+      #sidebar, #topbar, #bottom-nav, #fab-btn, #more-menu { display: none !important; }
+      #main { margin: 0; padding: 0; }
+      .no-print { display: none !important; }
+    }
+
+    .quick-actions-row { display: flex; gap: 12px; flex-wrap: nowrap; overflow-x: auto; }
+    .quick-actions-row .quick-action { flex: 1; min-width: 110px; display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 16px 10px; background: var(--bg3); border-radius: 12px; cursor: pointer; transition: all 0.2s; text-align: center; }
+    .quick-actions-row .quick-action:hover { background: rgba(21,101,192,0.08); transform: translateY(-2px); }
+    .quick-actions-row .qa-icon { font-size: 26px; }
+    .quick-actions-row .qa-label { font-size: 12px; font-weight: 600; color: var(--text); }
+    @media (max-width: 600px) {
+      .quick-actions-row { flex-wrap: wrap; }
+      .quick-actions-row .quick-action { flex: 0 0 calc(33.333% - 8px); min-width: 0; padding: 12px 6px; }
+      .quick-actions-row .qa-icon { font-size: 22px; }
+      .quick-actions-row .qa-label { font-size: 10px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- LOGIN PAGE -->
+  <div id="login-page">
+    <div class="login-card">
+      <div class="login-logo">
+        <i class="fas fa-print"></i>
+        <h2>Shreeram DTP & Offset</h2>
+        <p>ERP System — Est. 2006</p>
+      </div>
+      <div class="login-error" id="login-error"></div>
+      <form id="login-form">
+        <div class="form-group">
+          <label>Username</label>
+          <input type="text" class="form-control" id="login-username" placeholder="Enter username" required autocomplete="username">
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" class="form-control" id="login-password" placeholder="Enter password" required autocomplete="current-password">
+        </div>
+        <button type="submit" class="btn-login">
+          <i class="fas fa-sign-in-alt"></i> Login
+        </button>
+      </form>
+      
+      <p style="text-align:center;margin-top:20px;font-size:12px;color:var(--text3);">
+        Default login: <strong>admin</strong> / <strong>admin123</strong>
+      </p>
+    </div>
+  </div>
+
+  <!-- MAIN APP (hidden until login) -->
+  <div id="app" style="display:none;">
+    <div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+
+    <!-- SIDEBAR -->
+    <nav id="sidebar">
+      <div class="sidebar-logo">
+        <div class="logo-icon"><i class="fas fa-print"></i></div>
+        <div class="logo-text">
+          <strong>Shreeram DTP</strong>
+          <span>& Offset — Est. 2006</span>
+        </div>
+      </div>
+
+      <div class="sidebar-nav">
+        <div class="nav-section">Main</div>
+        <div class="nav-item active" onclick="showPage('dashboard',this)">
+          <i class="fas fa-th-large nav-icon"></i> Dashboard
+        </div>
+        <div class="nav-item" onclick="showPage('notifications',this)">
+          <i class="fas fa-bell nav-icon"></i> Notifications
+          <span class="badge-pill">5</span>
+        </div>
+
+        <div class="nav-section">Customer & Sales</div>
+        <div class="nav-item" onclick="showPage('customers',this)">
+          <i class="fas fa-users nav-icon"></i> Customers
+        </div>
+        <div class="nav-item" onclick="showPage('quotations',this)">
+          <i class="fas fa-file-alt nav-icon"></i> Quotations
+        </div>
+        <div class="nav-item" onclick="showPage('billing',this)">
+          <i class="fas fa-file-invoice-dollar nav-icon"></i> Billing & Invoices
+          <span class="badge-pill">3</span>
+        </div>
+
+        <div class="nav-section">Production</div>
+
+        <div class="nav-section">Finance & Stock</div>
+        <div class="nav-item" onclick="showPage('accounting',this)">
+          <i class="fas fa-calculator nav-icon"></i> Accounting
+        </div>
+        <div class="nav-item" onclick="showPage('inventory',this)">
+          <i class="fas fa-boxes nav-icon"></i> Inventory
+        </div>
+        <div class="nav-item" onclick="showPage('purchase',this)">
+          <i class="fas fa-shopping-cart nav-icon"></i> Purchase
+        </div>
+
+        <div class="nav-section">Reports & HR</div>
+        <div class="nav-item" onclick="showPage('reports',this)">
+          <i class="fas fa-chart-bar nav-icon"></i> Reports
+        </div>
+
+        <div class="nav-section">System</div>
+        <div class="nav-item" onclick="showPage('settings',this)">
+          <i class="fas fa-cog nav-icon"></i> Settings
+        </div>
+      </div>
+
+      <div class="sidebar-bottom">
+        <div class="user-card">
+          <div class="user-avatar" id="user-avatar">A</div>
+          <div class="user-info">
+            <strong id="user-name">Admin</strong>
+            <span id="user-role">Administrator</span>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- TOPBAR -->
+    <header id="topbar">
+      <div class="topbar-btn" id="menu-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></div>
+      <div class="topbar-title"><span id="topbar-title-text">Dashboard</span></div>
+      <div class="topbar-search">
+        <i class="fas fa-search" style="color:var(--text3);font-size:13px;"></i>
+        <input type="text" placeholder="Search..." id="globalSearch">
+      </div>
+      <div class="topbar-btn" onclick="toggleTheme()" title="Toggle Dark/Light"><i class="fas fa-moon" id="theme-icon"></i></div>
+      <div class="topbar-btn" onclick="logout()" title="Logout"><i class="fas fa-sign-out-alt"></i></div>
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <main id="main">
+      <!-- Dashboard, Customers, Billing, etc. pages will be loaded here -->
+      <div class="page active" id="page-dashboard">
+        <div class="page-header" style="margin-bottom:12px;">
+          <div>
+            <h2>Dashboard</h2>
+            <p id="dashboard-date" style="font-size:12px;">Business Overview</p>
+          </div>
+        </div>
+        <div class="dash-stats">
+          <div class="stat-card green">
+            <div class="stat-icon"><i class="fas fa-arrow-down"></i></div>
+            <div class="stat-label">To Collect</div>
+            <div class="stat-value" id="dash-collect">₹0</div>
+          </div>
+          <div class="stat-card red">
+            <div class="stat-icon"><i class="fas fa-arrow-up"></i></div>
+            <div class="stat-label">To Pay</div>
+            <div class="stat-value" id="dash-pay">₹0</div>
+          </div>
+          <div class="stat-card blue">
+            <div class="stat-icon"><i class="fas fa-wallet"></i></div>
+            <div class="stat-label">Cash + Bank Balance</div>
+            <div class="stat-value" id="dash-balance">₹0</div>
+          </div>
+        </div>
+        <div class="card-box mb-3">
+          <div class="card-head" style="padding:8px 14px;"><h3 style="font-size:14px;">📊 Sales Summary</h3></div>
+          <div class="card-body-p" style="padding:12px;">
+            <div class="dash-summary-grid">
+              <div class="report-metric"><div class="rm-val" id="ss-total-sales">₹0</div><div class="rm-label">Total Sales</div></div>
+              <div class="report-metric"><div class="rm-val" id="ss-collected" style="color:var(--success);">₹0</div><div class="rm-label">Collected</div></div>
+              <div class="report-metric"><div class="rm-val" id="ss-outstanding" style="color:var(--danger);">₹0</div><div class="rm-label">Outstanding</div></div>
+              <div class="report-metric"><div class="rm-val" id="ss-bills" style="color:var(--primary);">0</div><div class="rm-label">Total Bills</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page" id="page-customers">
+        <div class="page-header">
+          <div><h2>Customer Management</h2><p>Manage your customer database</p></div>
+          <button class="btn-primary-erp" onclick="openModal('add-customer-modal')"><i class="fas fa-plus"></i> Add Customer</button>
+        </div>
+        <div class="card-box">
+          <div class="card-head"><h3>Customer List</h3></div>
+          <div style="overflow-x:auto;"><table class="erp-table" id="customer-table">
+            <thead><tr><th>#</th><th>Name</th><th>Phone</th><th>City</th><th>Actions</th></tr></thead>
+            <tbody id="customer-tbody"></tbody>
+          </table></div>
+        </div>
+      </div>
+
+      <div class="page" id="page-billing">
+        <div class="page-header">
+          <div><h2>Sales Invoices</h2><p>GST & Non-GST invoice management</p></div>
+          <button class="btn-primary-erp" onclick="switchBillingView('create','gst')"><i class="fas fa-plus"></i> Create Invoice</button>
+        </div>
+        <div id="billing-list-view">
+          <div class="card-box">
+            <div class="card-head"><h3>All Invoices</h3></div>
+            <div style="overflow-x:auto;"><table class="erp-table">
+              <thead><tr><th>Invoice #</th><th>Party Name</th><th>Date</th><th>Amount</th><th>Status</th><th>Actions</th></tr></thead>
+              <tbody id="billing-tbody"></tbody>
+            </table></div>
+          </div>
+        </div>
+        <div id="billing-create-view" style="display:none;">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+            <button class="btn-ghost-erp" onclick="switchBillingView('list')"><i class="fas fa-arrow-left"></i> Back</button>
+            <h2 style="font-size:18px;font-weight:800;color:var(--text);flex:1;">Create Sales Invoice</h2>
+            <button class="btn-primary-erp" onclick="saveCurrentInvoice()"><i class="fas fa-check"></i> Save</button>
+          </div>
+          <div class="card-box mb-3">
+            <div class="card-head" style="padding:12px 16px;"><h3 style="font-size:14px;">Bill To</h3></div>
+            <div style="padding:16px;">
+              <div class="form-group">
+                <label class="form-label-erp">Customer Name</label>
+                <input type="text" class="form-control-erp" id="ci-customer" placeholder="Customer name">
+              </div>
+            </div>
+          </div>
+          <div class="card-box mb-3">
+            <div style="overflow-x:auto;">
+              <table style="width:100%;border-collapse:collapse;" id="inv-items-table">
+                <thead>
+                  <tr style="background:var(--bg3);">
+                    <th style="padding:10px 12px;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;">#</th>
+                    <th style="padding:10px 12px;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;">Items / Services</th>
+                    <th style="padding:10px 12px;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;">Qty</th>
+                    <th style="padding:10px 12px;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;">Price/Item (₹)</th>
+                    <th style="padding:10px 12px;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;">Amount (₹)</th>
+                    <th style="width:32px;"></th>
+                  </tr>
+                </thead>
+                <tbody id="inv-line-items"></tbody>
+              </table>
+            </div>
+            <div style="padding:12px 16px;border-top:1px solid var(--border);">
+              <button class="btn-ghost-erp btn-sm-erp" onclick="addLineItem()"><i class="fas fa-plus"></i> + Add Item</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page" id="page-accounting">
+        <div class="page-header">
+          <div><h2>Accounting</h2><p>Cash book, income & expense tracking</p></div>
+        </div>
+        <div class="card-box mb-3">
+          <div class="card-head"><h3>📈 Revenue Overview</h3></div>
+          <div class="card-body-p"><canvas id="revenueChart" style="height:220px;max-height:220px;"></canvas></div>
+        </div>
+        <div class="card-box">
+          <div class="card-head"><h3>Recent Transactions</h3></div>
+          <div style="overflow-x:auto;"><table class="erp-table">
+            <thead><tr><th>Date</th><th>Description</th><th>Category</th><th>Type</th><th>Amount</th></thead>
+            <tbody id="accounting-tbody"></tbody>
+          </table></div>
+        </div>
+      </div>
+
+      <div class="page" id="page-inventory">
+        <div class="page-header">
+          <div><h2>Products / Inventory</h2><p>Manage your products</p></div>
+          <button class="btn-primary-erp" onclick="openModal('add-product-modal')"><i class="fas fa-plus"></i> Add Product</button>
+        </div>
+        <div class="card-box">
+          <div class="card-head"><h3>📦 Product List</h3></div>
+          <div style="overflow-x:auto;">
+            <table class="erp-table" id="products-table">
+              <thead><tr><th>#</th><th>Product Name</th><th>HSN/SAC</th><th>Price (₹)</th><th>GST %</th><th>Stock Qty</th><th>Sold</th><th>Actions</th></tr></thead>
+              <tbody id="products-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="page" id="page-reports">
+        <div class="page-header">
+          <div><h2>Reports & Analytics</h2><p>Live business data</p></div>
+        </div>
+        <div class="row g-3 mb-3">
+          <div class="col-6 col-md-3"><div class="report-metric card-box py-3"><div class="rm-val" id="rpt-revenue">₹0</div><div class="rm-label">Total Revenue</div></div></div>
+          <div class="col-6 col-md-3"><div class="report-metric card-box py-3"><div class="rm-val" id="rpt-paid" style="color:var(--success);">₹0</div><div class="rm-label">Collected</div></div></div>
+          <div class="col-6 col-md-3"><div class="report-metric card-box py-3"><div class="rm-val" id="rpt-outstanding" style="color:var(--danger);">₹0</div><div class="rm-label">Outstanding</div></div></div>
+          <div class="col-6 col-md-3"><div class="report-metric card-box py-3"><div class="rm-val" id="rpt-invoices" style="color:var(--primary);">0</div><div class="rm-label">Invoices</div></div></div>
+        </div>
+        <div class="card-box mb-3">
+          <div class="card-head"><h3>📊 GST Summary Report</h3></div>
+          <div class="card-body-p">
+            <div class="row g-3 mb-3">
+              <div class="col-6 col-md-3"><div style="background:var(--bg3);padding:14px;border-radius:10px;text-align:center;"><div style="font-size:20px;font-weight:800;color:var(--primary);" id="rpt-taxable">₹0</div><div style="font-size:11px;color:var(--text3);font-weight:700;text-transform:uppercase;">Taxable</div></div></div>
+              <div class="col-6 col-md-3"><div style="background:var(--bg3);padding:14px;border-radius:10px;text-align:center;"><div style="font-size:20px;font-weight:800;color:var(--warning);" id="rpt-cgst">₹0</div><div style="font-size:11px;color:var(--text3);font-weight:700;text-transform:uppercase;">CGST (9%)</div></div></div>
+              <div class="col-6 col-md-3"><div style="background:var(--bg3);padding:14px;border-radius:10px;text-align:center;"><div style="font-size:20px;font-weight:800;color:var(--warning);" id="rpt-sgst">₹0</div><div style="font-size:11px;color:var(--text3);font-weight:700;text-transform:uppercase;">SGST (9%)</div></div></div>
+              <div class="col-6 col-md-3"><div style="background:rgba(21,101,192,0.08);padding:14px;border-radius:10px;text-align:center;border:1.5px solid var(--primary);"><div style="font-size:20px;font-weight:800;color:var(--primary);" id="rpt-total-gst">₹0</div><div style="font-size:11px;color:var(--primary);font-weight:700;text-transform:uppercase;">Total GST</div></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page" id="page-notifications">
+        <div class="page-header"><div><h2>Notifications</h2><p>Alerts, reminders & system messages</p></div></div>
+        <div class="card-box">
+          <div class="card-body-p" id="notif-list"></div>
+        </div>
+      </div>
+
+      <div class="page" id="page-settings">
+        <div class="page-header"><div><h2>Settings</h2><p>Company profile, GST, bank & preferences</p></div></div>
+        <div class="row g-3">
+          <div class="col-12 col-md-6">
+            <div class="card-box">
+              <div class="card-head"><h3>🏢 Company Profile</h3></div>
+              <div class="card-body-p">
+                <div class="row g-3">
+                  <div class="col-12"><label class="form-label-erp">Company Name</label><input class="form-control-erp" id="set-co-name"></div>
+                  <div class="col-12"><label class="form-label-erp">Address</label><input class="form-control-erp" id="set-co-addr"></div>
+                  <div class="col-6"><label class="form-label-erp">Phone</label><input class="form-control-erp" id="set-co-phone"></div>
+                  <div class="col-6"><label class="form-label-erp">Email</label><input class="form-control-erp" id="set-co-email"></div>
+                  <div class="col-12"><button class="btn-primary-erp" data-admin-only="true" onclick="saveSettings('company')"><i class="fas fa-save"></i> Save Company Info</button></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-12 col-md-6">
+            <div class="card-box">
+              <div class="card-head"><h3>🧾 GST Details</h3></div>
+              <div class="card-body-p">
+                <div class="row g-3">
+                  <div class="col-12"><label class="form-label-erp">GSTIN</label><input class="form-control-erp" id="set-gstin"></div>
+                  <div class="col-12"><label class="form-label-erp">PAN Number</label><input class="form-control-erp" id="set-pan"></div>
+                  <div class="col-12"><button class="btn-primary-erp" data-admin-only="true" onclick="saveSettings('gst')"><i class="fas fa-save"></i> Save GST Info</button></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-12">
+            <div class="card-box">
+              <div class="card-head"><h3>🔑 Google Sign-In</h3></div>
+              <div class="card-body-p">
+                <div class="row g-3">
+                  <div class="col-12"><label class="form-label-erp">Client ID</label><input class="form-control-erp" id="set-google-client-id" placeholder="your-client-id.apps.googleusercontent.com"></div>
+                  <div class="col-12"><label class="form-label-erp">Client Secret</label><input class="form-control-erp" id="set-google-client-secret" type="password" placeholder="Paste your client secret"></div>
+                  <div class="col-12"><label class="form-label-erp">Redirect URI</label><input class="form-control-erp" id="set-google-callback-url" placeholder="http://127.0.0.1:3000/api/auth/google/callback"></div>
+                  <div class="col-12">
+                    <button class="btn-primary-erp" data-admin-only="true" onclick="saveGoogleOAuth()"><i class="fas fa-save"></i> Save Google OAuth</button>
+                    <button class="btn-ghost-erp" onclick="testGoogleOAuth()" style="margin-left:8px;"><i class="fas fa-plug"></i> Test</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-12" id="settings-admin-section" data-admin-only="true" style="display:none;">
+            <div class="card-box">
+              <div class="card-head"><h3>👥 User Management</h3></div>
+              <div class="card-body-p">
+                <div class="row g-3" style="margin-bottom:18px;">
+                  <div class="col-12 col-md-3">
+                    <label class="form-label-erp">Username</label>
+                    <input class="form-control-erp" id="new-user-username" placeholder="Enter username">
+                  </div>
+                  <div class="col-12 col-md-3">
+                    <label class="form-label-erp">Email (optional)</label>
+                    <input class="form-control-erp" id="new-user-email" type="email" placeholder="name@example.com">
+                  </div>
+                  <div class="col-12 col-md-3">
+                    <label class="form-label-erp">Password</label>
+                    <input class="form-control-erp" id="new-user-password" type="password" placeholder="Enter password">
+                  </div>
+                  <div class="col-12 col-md-2">
+                    <label class="form-label-erp">Role</label>
+                    <select class="form-control-erp" id="new-user-role">
+                      <option value="user">User</option>
+                      <option value="admin">Admin</option>
+                    </select>
+                  </div>
+                  <div class="col-12 col-md-1 d-flex align-items-end">
+                    <button class="btn-primary-erp" style="width:100%;" onclick="createUser()"><i class="fas fa-user-plus"></i></button>
+                  </div>
+                </div>
+
+                <div style="overflow-x:auto;">
+                  <table class="erp-table">
+                    <thead>
+                      <tr>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>Google</th>
+                        <th>Created</th>
+                        <th>New Password</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody id="users-tbody">
+                      <tr>
+                        <td colspan="7" style="text-align:center;color:var(--text3);">Loading users...</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- MODALS -->
+  <div class="erp-modal-overlay" id="add-customer-modal">
+    <div class="erp-modal">
+      <div class="erp-modal-head">
+        <h4>👤 Add New Customer</h4>
+        <button class="modal-close" onclick="closeModal('add-customer-modal')">✕</button>
+      </div>
+      <div class="erp-modal-body">
+        <div class="row g-3">
+          <div class="col-6"><label class="form-label-erp">Full Name</label><input class="form-control-erp" id="cust-name-field"></div>
+          <div class="col-6"><label class="form-label-erp">Phone / WhatsApp</label><input class="form-control-erp" id="cust-phone-field"></div>
+          <div class="col-6"><label class="form-label-erp">Email</label><input class="form-control-erp" id="cust-email-field" type="email"></div>
+          <div class="col-6"><label class="form-label-erp">City</label><input class="form-control-erp" id="cust-city-field"></div>
+          <div class="col-12"><label class="form-label-erp">Address</label><textarea class="form-control-erp" id="cust-addr-field" rows="2"></textarea></div>
+          <div class="col-12">
+            <label class="form-label-erp">GSTIN (Optional)</label>
+            <input class="form-control-erp" id="cust-gstin" oninput="this.value=this.value.toUpperCase()">
+          </div>
+        </div>
+      </div>
+      <div class="erp-modal-foot">
+        <button class="btn-ghost-erp" onclick="closeModal('add-customer-modal')">Cancel</button>
+        <button class="btn-primary-erp" onclick="saveCustomer()"><i class="fas fa-save"></i> Save Customer</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="erp-modal-overlay" id="add-product-modal">
+    <div class="erp-modal">
+      <div class="erp-modal-head"><h4>📦 Add Product</h4><button class="modal-close" onclick="closeModal('add-product-modal')">✕</button></div>
+      <div class="erp-modal-body">
+        <div class="row g-3">
+          <div class="col-12"><label class="form-label-erp">Product Name</label><input class="form-control-erp" id="prod-m-name"></div>
+          <div class="col-6"><label class="form-label-erp">HSN/SAC</label><input class="form-control-erp" id="prod-m-hsn"></div>
+          <div class="col-6"><label class="form-label-erp">Price (₹)</label><input class="form-control-erp" type="number" id="prod-m-price"></div>
+          <div class="col-6"><label class="form-label-erp">GST %</label><input class="form-control-erp" type="number" id="prod-m-tax" value="18"></div>
+          <div class="col-6"><label class="form-label-erp">Stock Qty</label><input class="form-control-erp" type="number" id="prod-m-qty" value="0"></div>
+        </div>
+      </div>
+      <div class="erp-modal-foot">
+        <button class="btn-ghost-erp" onclick="closeModal('add-product-modal')">Cancel</button>
+        <button class="btn-primary-erp" onclick="saveProduct()"><i class="fas fa-save"></i> Save Product</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="vendor/axios/axios.min.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

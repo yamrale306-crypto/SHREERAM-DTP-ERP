@@ -41,26 +41,8 @@ if (!process.env.GOOGLE_CALLBACK_URL) {
 const { resolveDatabasePath } = require('./config/runtime');
 
 function buildCorsOptions() {
-  const originValue = process.env.CORS_ORIGIN;
-
-  if (!originValue) {
-    return { origin: true, credentials: true };
-  }
-
-  const allowedOrigins = originValue
-    .split(',')
-    .map((value) => value.trim())
-    .filter(Boolean);
-
   return {
-    origin(origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-        return;
-      }
-
-      callback(new Error('CORS not allowed'));
-    },
+    origin: true,
     credentials: true
   };
 }

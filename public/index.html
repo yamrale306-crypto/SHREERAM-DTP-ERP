@@ -828,20 +828,36 @@
       </div>
       <div class="erp-modal-body">
         <div class="row g-3">
-          <div class="col-6"><label class="form-label-erp">Full Name</label><input class="form-control-erp" id="cust-name-field"></div>
-          <div class="col-6"><label class="form-label-erp">Phone / WhatsApp</label><input class="form-control-erp" id="cust-phone-field"></div>
+          <div class="col-6"><label class="form-label-erp">Full Name *</label><input class="form-control-erp" id="cust-name-field" required></div>
+          <div class="col-6"><label class="form-label-erp">Phone / WhatsApp</label><input class="form-control-erp" id="cust-phone-field" type="tel"></div>
           <div class="col-6"><label class="form-label-erp">Email</label><input class="form-control-erp" id="cust-email-field" type="email"></div>
           <div class="col-6"><label class="form-label-erp">City</label><input class="form-control-erp" id="cust-city-field"></div>
           <div class="col-12"><label class="form-label-erp">Address</label><textarea class="form-control-erp" id="cust-addr-field" rows="2"></textarea></div>
-          <div class="col-12">
+          <div class="col-6">
             <label class="form-label-erp">GSTIN (Optional)</label>
             <input class="form-control-erp" id="cust-gstin" oninput="this.value=this.value.toUpperCase()">
+          </div>
+          <div class="col-6">
+            <label class="form-label-erp">Customer Type</label>
+            <select class="form-control-erp" id="cust-type-field">
+              <option value="Regular">Regular</option>
+              <option value="Wholesale">Wholesale</option>
+              <option value="Retail">Retail</option>
+              <option value="Corporate">Corporate</option>
+            </select>
+          </div>
+          <div class="col-6">
+            <label class="form-label-erp">Status</label>
+            <select class="form-control-erp" id="cust-status-field">
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+            </select>
           </div>
         </div>
       </div>
       <div class="erp-modal-foot">
         <button class="btn-ghost-erp" onclick="closeModal('add-customer-modal')">Cancel</button>
-        <button class="btn-primary-erp" onclick="saveCustomer()"><i class="fas fa-save"></i> Save Customer</button>
+        <button class="btn-primary-erp" onclick="saveCustomer()" id="save-customer-btn"><i class="fas fa-save"></i> Save Customer</button>
       </div>
     </div>
   </div>

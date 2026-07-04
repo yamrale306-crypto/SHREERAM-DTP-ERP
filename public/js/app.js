@@ -11,6 +11,7 @@ let lineItemId = 0;
 let currentInvType = 'gst';
 let editingInvoice = null;
 let editingProductIdx = null;
+let editingCustomerId = null;
 
 function isAdmin() {
   return currentUser?.role === 'admin';
@@ -276,12 +277,12 @@ async function loadCustomers() {
     tbody.innerHTML = customers.map((c, i) => `
       <tr>
         <td>${i + 1}</td>
-        <td><strong>${c.name}</strong></td>
+        <td><strong class="customer-name">${c.name}</strong></td>
         <td>${c.phone || '—'}</td>
         <td>${c.city || '—'}</td>
         <td>
-          <button class="btn-icon" onclick="editCustomer(${c.id})"><i class="fas fa-edit"></i></button>
-          <button class="btn-icon danger" onclick="deleteCustomer(${c.id})"><i class="fas fa-trash"></i></button>
+          <button class="btn-icon" onclick="editCustomer(${c.id})" title="Edit"><i class="fas fa-edit"></i></button>
+          <button class="btn-icon danger" onclick="deleteCustomer(${c.id})" title="Delete"><i class="fas fa-trash"></i></button>
         </td>
       </tr>
     `).join('') || '<tr><td colspan="5" style="text-align:center;color:var(--text3);">No customers yet</td></tr>';
@@ -298,6 +299,8 @@ async function saveCustomer() {
   const city = document.getElementById('cust-city-field').value.trim();
   const address = document.getElementById('cust-addr-field').value.trim();
   const gstin = document.getElementById('cust-gstin').value.trim();
+  const customer_type = document.getElementById('cust-type-field').value;
+  const status = document.getElementById('cust-status-field').value;
   
   if (!name) {
     showToast('Customer name is required', 'error');
@@ -305,18 +308,37 @@ async function saveCustomer() {
   }
   
   try {
-    await apiCall('/customers', 'POST', {
-      name,
-      phone,
-      email,
-      city,
-      address,
-      gstin
-    });
+    if (editingCustomerId) {
+      // Update existing customer
+      await apiCall(`/customers/${editingCustomerId}`, 'PUT', {
+        name,
+        phone,
+        email,
+        city,
+        address,
+        gstin,
+        customer_type,
+        status
+      });
+      showToast('Customer updated successfully!', 'success');
+      editingCustomerId = null;
+    } else {
+      // Create new customer
+      await apiCall('/customers', 'POST', {
+        name,
+        phone,
+        email,
+        city,
+        address,
+        gstin,
+        customer_type,
+        status
+      });
+      showToast('Customer added successfully!', 'success');
+    }
     
     closeModal('add-customer-modal');
     loadCustomers();
-    showToast('Customer added successfully!', 'success');
     
     // Clear form
     document.getElementById('cust-name-field').value = '';
@@ -325,6 +347,9 @@ async function saveCustomer() {
     document.getElementById('cust-city-field').value = '';
     document.getElementById('cust-addr-field').value = '';
     document.getElementById('cust-gstin').value = '';
+    document.getElementById('cust-type-field').value = 'Regular';
+    document.getElementById('cust-status-field').value = 'active';
+    document.getElementById('save-customer-btn').innerHTML = '<i class="fas fa-save"></i> Save Customer';
     
   } catch (error) {
     showToast(error.response?.data?.error || 'Failed to save customer', 'error');
@@ -343,8 +368,30 @@ async function deleteCustomer(id) {
   }
 }
 
-function editCustomer(id) {
-  showToast('Edit customer - coming soon', 'info');
+async function editCustomer(id) {
+  try {
+    const customer = await apiCall(`/customers/${id}`);
+    
+    // Populate form with customer data
+    document.getElementById('cust-name-field').value = customer.name || '';
+    document.getElementById('cust-phone-field').value = customer.phone || '';
+    document.getElementById('cust-email-field').value = customer.email || '';
+    document.getElementById('cust-city-field').value = customer.city || '';
+    document.getElementById('cust-addr-field').value = customer.address || '';
+    document.getElementById('cust-gstin').value = customer.gstin || '';
+    document.getElementById('cust-type-field').value = customer.customer_type || 'Regular';
+    document.getElementById('cust-status-field').value = customer.status || 'active';
+    
+    // Set editing mode
+    editingCustomerId = id;
+    document.getElementById('save-customer-btn').innerHTML = '<i class="fas fa-check"></i> Update Customer';
+    
+    // Open modal
+    openModal('add-customer-modal');
+    
+  } catch (error) {
+    showToast(error.response?.data?.error || 'Failed to load customer', 'error');
+  }
 }
 
 // ============= INVOICES =============
